@@ -4,18 +4,22 @@ print ("Alright,", username,",", "damn the torpedos!!!", "Let's play battleship!
 difficuly = input("What difficulty would you like to play on? Easy, Medium, Hard, or Ultra? ")
 board = []
 tries_allowed = 5
+count = 0
+destroyer_notification = 0
+submarine_notification = 0
+loop_number = 999
 if difficuly.lower() == "easy":
+    for x in range(5):
+      board.append(["*"] * 5)
+elif difficuly.lower() == "medium":
     for x in range(10):
       board.append(["*"] * 10)
-elif difficuly.lower() == "medium":
+elif difficuly.lower() == "hard":
     for x in range(15):
       board.append(["*"] * 15)
-elif difficuly.lower() == "hard":
-    for x in range(20):
-      board.append(["*"] * 20)
 elif difficuly.lower() == "ultra":
-    for x in range(30):
-      board.append(["*"] * 30)
+    for x in range(40):
+      board.append(["*"] * 40)
 
 
 def print_board(board):
@@ -33,62 +37,74 @@ horizontal_ship_row_index = random_row(board)
 first_coordinate_random_horizontal_ship_column = randint(0, len(board[0]) - 2)
 second_coordinate_random_horizontal_ship_column = first_coordinate_random_horizontal_ship_column + 1
 
+#The variables for where the boat is
 
-
-first_vertical_ship_row_index = random_row(board)
-second_vertical_ship_row_index = first_vertical_ship_row_index - 1
+#Drawing a ship of 3 length that won't ever go off the board
+first_vertical_ship_row_index = randint(0, len(board) - 3)
+second_vertical_ship_row_index = first_vertical_ship_row_index + 1
+third_vertical_ship_row_index = first_vertical_ship_row_index + 2
 VERTICAL_ship_column = random_col(board)
 
+#The location of the vertical boat
 
 #RADAR
-print ("*********Our radar detects a ship coordinates is on the: ", horizontal_ship_row_index, "row, and", (first_coordinate_random_horizontal_ship_column), "and", second_coordinate_random_horizontal_ship_column, "column****************")
-print ("*****Our radar also reads a ship at the ", first_vertical_ship_row_index, "and", second_vertical_ship_row_index, "rows, and", VERTICAL_ship_column, "column")
+print ("")
+print ("*********Our radar detects a Submarine at: ", horizontal_ship_row_index, "row, and", (first_coordinate_random_horizontal_ship_column), "and", second_coordinate_random_horizontal_ship_column, "column****************")
+print ("")
+print ("*****Our radar detects a Destroyer ship at: ", first_vertical_ship_row_index, second_vertical_ship_row_index, third_vertical_ship_row_index, "rows, and the", VERTICAL_ship_column, "column")
+print ("")
 
-
-for turn in range(tries_allowed):
-    #If player runs out of turns, it's game over and you get to see the board
-    print ("You have done ", turn, "out of", tries_allowed, "tries.")
-    if board[horizontal_ship_row_index][first_coordinate_random_horizontal_ship_column] == "X" and board[horizontal_ship_row_index][second_coordinate_random_horizontal_ship_column] == "X" and board[first_vertical_ship_row_index][VERTICAL_ship_column] == "X" and board[second_vertical_ship_row_index][VERTICAL_ship_column] == "X":
-        for x in range(50):
+for turn in range(loop_number):
+    if board[horizontal_ship_row_index][first_coordinate_random_horizontal_ship_column] == "X" and board[horizontal_ship_row_index][second_coordinate_random_horizontal_ship_column] == "X" and board[first_vertical_ship_row_index][VERTICAL_ship_column] == "X" and board[second_vertical_ship_row_index][VERTICAL_ship_column] == "X" and board[third_vertical_ship_row_index][VERTICAL_ship_column] == "X":
+        for x in range(5):
             print ("*************YOU WIN!!!!!****************")
         for x in range(0, len(board)):
             for y in range(0, len(board[0])):
                 if board[x][y] != "X":
                     board[x][y] = "O"
         print_board(board)
-
         break
+    #This is to run only once when the player destroys the destroyer ship
+    if destroyer_notification == 0 and board[first_vertical_ship_row_index][VERTICAL_ship_column] == "X" and board[second_vertical_ship_row_index][VERTICAL_ship_column] == "X" and board[third_vertical_ship_row_index][VERTICAL_ship_column] == "X":
+        print ("YOU DESTROYED THEIR DESTROYER!!!")
+        destroyer_notification += 1
+    if submarine_notification == 0 and board[horizontal_ship_row_index][first_coordinate_random_horizontal_ship_column] == "X" and board[horizontal_ship_row_index][second_coordinate_random_horizontal_ship_column] == "X":
+        print ("YOU DESTROYED THEIR SUBMARINE")
+        submarine_notification += 1
+    print ("You have done ", count, "out of", tries_allowed, "tries.")
+    print ("")
+
     print_board(board)
     print ("")
     guess_row = int(input("Guess Row: "))
     guess_col = int(input("Guess Col: "))
-    if guess_row == horizontal_ship_row_index and (guess_col == first_coordinate_random_horizontal_ship_column or guess_col == second_coordinate_random_horizontal_ship_column) or (guess_row == first_vertical_ship_row_index or guess_row == second_vertical_ship_row_index) and guess_col == VERTICAL_ship_column:
-        print ("You got that correct")
+    if guess_row == horizontal_ship_row_index and (guess_col == first_coordinate_random_horizontal_ship_column or guess_col == second_coordinate_random_horizontal_ship_column) or (guess_row == first_vertical_ship_row_index or guess_row == second_vertical_ship_row_index or guess_row == third_vertical_ship_row_index) and guess_col == VERTICAL_ship_column:
+        print ("DIRECT HIT!!!")
         board[guess_row][guess_col] = "X"
         #player gets their turn back from guessing correct
-        print ("You have done ", turn, "out of 4 tries")
-        turn = turn -1
     else:
         if (guess_row < 0 or guess_row > (len(board) - 1)) or (guess_col < 0 or guess_col > (len(board[0]) - 1)):
             print ("That's off the board")
-            turn = turn -1
-
+            #gives player their turn back
         elif (board[guess_row][guess_col] == "X") or (board[guess_row][guess_col] == "O"):
             print ("You guessed that one already.")
-            turn = turn -1
+            #gives player their turn back
         else:
             print ("You missed!!!")
             board[guess_row][guess_col] = "O"
-if turn == tries_allowed - 1:
-    print ("Game over,", username)
-    #This just gives the answers for the player to see if they lose
-    board[horizontal_ship_row_index][first_coordinate_random_horizontal_ship_column] = "X"
-    board[horizontal_ship_row_index][second_coordinate_random_horizontal_ship_column] = "X"
+            count = count + 1
+    if count == 5:
+        print ("Game over,", username)
+        #This just gives the answers for the player to see if they lose
+        board[horizontal_ship_row_index][first_coordinate_random_horizontal_ship_column] = "X"
+        board[horizontal_ship_row_index][second_coordinate_random_horizontal_ship_column] = "X"
 
-    board[first_vertical_ship_row_index][VERTICAL_ship_column] = "X"
-    board[second_vertical_ship_row_index][VERTICAL_ship_column] = "X"
-    for x in range(0, len(board)):
-        for y in range(0, len(board[0])):
-            if board[x][y] != "X":
-                board[x][y] = "O"
-    print_board(board)
+        board[first_vertical_ship_row_index][VERTICAL_ship_column] = "X"
+        board[second_vertical_ship_row_index][VERTICAL_ship_column] = "X"
+        board[third_vertical_ship_row_index][VERTICAL_ship_column] = "X"
+        for x in range(0, len(board)):
+            for y in range(0, len(board[0])):
+                if board[x][y] != "X":
+                    board[x][y] = "O"
+        print_board(board)
+        break
