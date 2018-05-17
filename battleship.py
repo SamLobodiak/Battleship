@@ -75,8 +75,15 @@ for turn in range(loop_number):
 
     print_board(board)
     print ("")
-    guess_row = int(input("Guess Row: "))
-    guess_col = int(input("Guess Col: "))
+
+    #If user inputs anything other than an int it will not let them
+    while True:
+        try:
+            guess_row = int(input("Guess Row: "))
+            guess_col = int(input("Guess Col: "))
+            break
+        except ValueError:
+            print ("Oops!  That was no valid number.  Try again...")
     #if player guesses the right coordinates of any ship
     if guess_row == horizontal_ship_row_index and (guess_col == first_coordinate_random_horizontal_ship_column or guess_col == second_coordinate_random_horizontal_ship_column) or (guess_row == first_vertical_ship_row_index or guess_row == second_vertical_ship_row_index or guess_row == third_vertical_ship_row_index) and guess_col == VERTICAL_ship_column:
         print ("DIRECT HIT!!!")
